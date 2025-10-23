@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frame KSD Campaign Maker</title>
+  <style>
+    body {
+      font-family: "Anek Malayalam", sans-serif;
+      text-align: center;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+    }
+    canvas {
+      max-width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    select, input, button {
+      margin: 8px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  </style>
+
+  <!-- Anek Malayalam font -->
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h2>🖼️ Frame KSD Campaign Maker</h2>
+  <canvas id="canvas" width="600" height="600"></canvas>
+
+  <div class="controls">
+    <label>Choose Frame:</label>
+    <select id="frameSelect"></select>
+    <br>
+    <input type="file" id="photoInput" accept="image/*"><br>
+    <input type="text" id="nameInput" placeholder="Enter Name"><br>
+    <input type="text" id="captionInput" placeholder="Enter Caption"><br>
+    <button id="downloadBtn">Download</button>
+  </div>
+
+  <script>
+    const frames = [
+      "KASARAGOD","CHERKALA","MANJESHWERAM","KUMBALA","BADIYADUKKA","MULLERIA",
+      "UDUMA","CHATTANCHAL","KANHANGAD","KALLAR","PARAPPA","TRIKARIPUR",
+      "NILESHWARAM","CHERUVATHUR","PERUMBATTA"
+    ];
+
+    const select = document.getElementById('frameSelect');
+    frames.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f;
+      opt.textContent = f;
+      select.appendChild(opt);
+    });
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let uploadedPhoto = null;
+
+    document.getElementById('photoInput').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const img = new Image();
+      img.onload = () => {
+        uploadedPhoto = img;
+        draw();
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    select.addEventListener('change', draw);
+    document.getElementById('nameInput').addEventListener('input', draw);
+    document.getElementById('captionInput').addEventListener('input', draw);
+
+    function draw() {
+      const frameName = select.value;
+      const frameImg = new Image();
+      frameImg.src = `frames/${frameName}.png`;
+
+      frameImg.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (uploadedPhoto) {
+          // adjust position and size as needed
+          ctx.drawImage(uploadedPhoto, 100, 100, 400, 400);
+        }
+
+        ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+
+        ctx.font = "32px 'Anek Malayalam'";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+
+        // Name
+        ctx.fillText(document.getElementById('nameInput').value, canvas.width/2, 540);
+        // Caption
+        ctx.font = "24px 'Anek Malayalam'";
+        ctx.fillText(document.getElementById('captionInput').value, canvas.width/2, 580);
+      };
+    }
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `${select.value}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+
+    draw();
+  </script>
+</body>
+</html>
