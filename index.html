@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Frame KSD Campaign Maker</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600&display=swap');
+    
     body {
       font-family: "Anek Malayalam", sans-serif;
       text-align: center;
@@ -33,6 +35,8 @@
       max-width: 300px;
       box-sizing: border-box;
       font-size: 16px;
+      font-family: "Anek Malayalam", sans-serif;
+      font-weight: 600;
     }
     button {
       background-color: #4CAF50;
@@ -48,8 +52,6 @@
       margin: 0 auto;
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="container">
@@ -67,6 +69,12 @@
   </div>
 
   <script>
+    // Load the font explicitly
+    document.fonts.ready.then(function() {
+      console.log('All fonts have loaded');
+      draw();
+    });
+
     const frames = [
       "KASARAGOD","CHERKALA","MANJESHWERAM","KUMBALA","BADIYADUKKA","MULLERIA",
       "UDUMA","CHATTANCHAL","KANHANGAD","KALLAR","PARAPPA","TRIKARIPUR",
@@ -151,13 +159,13 @@
         ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
         // Draw name text
-        ctx.font = "bold 133px 'Anek Malayalam', 'Noto Sans Malayalam', sans-serif";
+        ctx.font = "bold 133px 'Anek Malayalam', sans-serif";
         ctx.fillStyle = "#229b0f";
         ctx.textAlign = "center";
         ctx.fillText(document.getElementById('nameInput').value, namePos.x, namePos.y);
 
         // Draw caption text
-        ctx.font = "121px 'Anek Malayalam', 'Noto Sans Malayalam', sans-serif";
+        ctx.font = "121px 'Anek Malayalam', sans-serif";
         ctx.fillStyle = "black";
         ctx.fillText(document.getElementById('captionInput').value, captionPos.x, captionPos.y);
       };
