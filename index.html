@@ -95,8 +95,8 @@
     let photoPos = { x: 270, y: 0, w: 1940, h: 2953 };
     let draggingPhoto = false;
     let dragOffset = { x: 0, y: 0 };
-    const namePos = { x: 1240, y: 1790 };
-    const captionPos = { x: 1240, y: 1850 };
+    const namePos = { x: 1240, y: 1800 };
+    const captionPos = { x: 1240, y: 1920 };
     
     // Pinch zoom variables
     let initialPinchDistance = 0;
@@ -159,13 +159,13 @@
         ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
         // Draw name text
-        ctx.font = "bold 133px 'Anek Malayalam', sans-serif";
+        ctx.font = "bold 113px 'Anek Malayalam', sans-serif";
         ctx.fillStyle = "#229b0f";
         ctx.textAlign = "center";
         ctx.fillText(document.getElementById('nameInput').value, namePos.x, namePos.y);
 
         // Draw caption text
-        ctx.font = "121px 'Anek Malayalam', sans-serif";
+        ctx.font = "101px 'Anek Malayalam', sans-serif";
         ctx.fillStyle = "black";
         ctx.fillText(document.getElementById('captionInput').value, captionPos.x, captionPos.y);
       };
