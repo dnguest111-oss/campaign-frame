@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Frame KSD Campaign Maker</title>
   <style>
     body {
@@ -10,38 +10,59 @@
       text-align: center;
       background: #f7f7f7;
       margin: 0;
-      padding: 20px;
+      padding: 10px;
+      overflow-x: hidden;
     }
     canvas {
       max-width: 100%;
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      touch-action: none;
       cursor: grab;
     }
     .controls {
       margin-top: 20px;
+      padding: 0 10px;
     }
     select, input, button {
-      margin: 8px;
-      padding: 10px;
+      margin: 8px 0;
+      padding: 12px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      width: 100%;
+      max-width: 300px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
     }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h2>🖼️ Frame KSD Campaign Maker</h2>
-  <canvas id="canvas" width="600" height="600"></canvas>
+  <div class="container">
+    <h2>🖼️ Frame KSD Campaign Maker</h2>
+    <canvas id="canvas" width="2480" height="2953"></canvas>
 
-  <div class="controls">
-    <label>Choose Frame:</label>
-    <select id="frameSelect"></select>
-    <br>
-    <input type="file" id="photoInput" accept="image/*"><br>
-    <input type="text" id="nameInput" placeholder="Enter Name"><br>
-    <input type="text" id="captionInput" placeholder="Enter Caption"><br>
-    <button id="downloadBtn">Download</button>
+    <div class="controls">
+      <label>Choose Frame:</label>
+      <select id="frameSelect"></select>
+      <input type="file" id="photoInput" accept="image/*">
+      <input type="text" id="nameInput" placeholder="Enter Name">
+      <input type="text" id="captionInput" placeholder="Enter Caption">
+      <button id="downloadBtn">Download</button>
+    </div>
   </div>
 
   <script>
@@ -62,12 +83,11 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     let uploadedPhoto = null;
-    let photoPos = { x: 100, y: 100, w: 400, h: 400 };
+    let photoPos = { x: 295, y: 0, w: 1890, h: 2953 };
     let draggingPhoto = false;
     let dragOffset = { x: 0, y: 0 };
-    let textMove = null; // 'name' or 'caption'
-    const namePos = { x: 300, y: 540 };
-    const captionPos = { x: 300, y: 580 };
+    const namePos = { x: 1240, y: 1720 };
+    const captionPos = { x: 1240, y: 1780 };
 
     // Handle photo upload
     document.getElementById('photoInput').addEventListener('change', e => {
@@ -76,10 +96,35 @@
       const img = new Image();
       img.onload = () => {
         uploadedPhoto = img;
+        fitPhotoToArea();
         draw();
       };
       img.src = URL.createObjectURL(file);
     });
+
+    // Fit photo to the designated area
+    function fitPhotoToArea() {
+      if (!uploadedPhoto) return;
+      
+      const areaWidth = 1890; // 2480 - 295*2
+      const areaHeight = 2953;
+      const imgAspect = uploadedPhoto.width / uploadedPhoto.height;
+      const areaAspect = areaWidth / areaHeight;
+      
+      if (imgAspect > areaAspect) {
+        // Image is wider than area
+        photoPos.w = areaWidth;
+        photoPos.h = areaWidth / imgAspect;
+        photoPos.x = 295;
+        photoPos.y = (areaHeight - photoPos.h) / 2;
+      } else {
+        // Image is taller than area
+        photoPos.h = areaHeight;
+        photoPos.w = areaHeight * imgAspect;
+        photoPos.x = 295 + (areaWidth - photoPos.w) / 2;
+        photoPos.y = 0;
+      }
+    }
 
     select.addEventListener('change', draw);
     document.getElementById('nameInput').addEventListener('input', draw);
@@ -99,82 +144,103 @@
 
         ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
-        ctx.font = "32px 'Anek Malayalam'";
-        ctx.fillStyle = "white";
+        // Draw name text
+        ctx.font = "bold 48px 'Anek Malayalam'";
+        ctx.fillStyle = "black";
         ctx.textAlign = "center";
         ctx.fillText(document.getElementById('nameInput').value, namePos.x, namePos.y);
 
-        ctx.font = "24px 'Anek Malayalam'";
+        // Draw caption text
+        ctx.font = "36px 'Anek Malayalam'";
         ctx.fillText(document.getElementById('captionInput').value, captionPos.x, captionPos.y);
       };
     }
 
-    // 🖱️ Drag and move functionality
-    let isDragging = false;
-    let startX, startY;
-
-    canvas.addEventListener('mousedown', (e) => {
+    // Touch event handlers for mobile
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (touch.clientX - rect.left) * scaleX;
+      const y = (touch.clientY - rect.top) * scaleY;
 
-      // Detect click area (photo or text)
-      if (x > photoPos.x && x < photoPos.x + photoPos.w && y > photoPos.y && y < photoPos.y + photoPos.h) {
+      if (x > photoPos.x && x < photoPos.x + photoPos.w && 
+          y > photoPos.y && y < photoPos.y + photoPos.h) {
         draggingPhoto = true;
         dragOffset.x = x - photoPos.x;
         dragOffset.y = y - photoPos.y;
-      } else if (Math.abs(y - namePos.y) < 20) {
-        textMove = 'name';
-      } else if (Math.abs(y - captionPos.y) < 20) {
-        textMove = 'caption';
       }
+    });
 
-      startX = x;
-      startY = y;
-      isDragging = true;
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (!draggingPhoto) return;
+      
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (touch.clientX - rect.left) * scaleX;
+      const y = (touch.clientY - rect.top) * scaleY;
+
+      photoPos.x = x - dragOffset.x;
+      photoPos.y = y - dragOffset.y;
+      
+      // Keep photo within bounds
+      photoPos.x = Math.max(295, Math.min(photoPos.x, 295 + 1890 - photoPos.w));
+      photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
+      
+      draw();
+    });
+
+    canvas.addEventListener('touchend', () => {
+      draggingPhoto = false;
+    });
+
+    // Mouse event handlers for desktop
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
+
+      if (x > photoPos.x && x < photoPos.x + photoPos.w && 
+          y > photoPos.y && y < photoPos.y + photoPos.h) {
+        draggingPhoto = true;
+        dragOffset.x = x - photoPos.x;
+        dragOffset.y = y - photoPos.y;
+      }
     });
 
     canvas.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
+      if (!draggingPhoto) return;
+      
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
 
-      if (draggingPhoto) {
-        photoPos.x = x - dragOffset.x;
-        photoPos.y = y - dragOffset.y;
-      } else if (textMove === 'name') {
-        namePos.x += (x - startX);
-        namePos.y += (y - startY);
-        startX = x; startY = y;
-      } else if (textMove === 'caption') {
-        captionPos.x += (x - startX);
-        captionPos.y += (y - startY);
-        startX = x; startY = y;
-      }
-
+      photoPos.x = x - dragOffset.x;
+      photoPos.y = y - dragOffset.y;
+      
+      // Keep photo within bounds
+      photoPos.x = Math.max(295, Math.min(photoPos.x, 295 + 1890 - photoPos.w));
+      photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
+      
       draw();
     });
 
     canvas.addEventListener('mouseup', () => {
       draggingPhoto = false;
-      textMove = null;
-      isDragging = false;
     });
 
-    // 🔍 Scroll to zoom photo
-    canvas.addEventListener('wheel', (e) => {
-      if (!uploadedPhoto) return;
-      e.preventDefault();
-      const zoom = e.deltaY < 0 ? 1.05 : 0.95;
-      photoPos.w *= zoom;
-      photoPos.h *= zoom;
-      draw();
-    });
-
-    // 💾 High resolution download
+    // High resolution download
     document.getElementById('downloadBtn').addEventListener('click', () => {
-      const scale = 3;
+      const scale = 1;
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = canvas.width * scale;
       tempCanvas.height = canvas.height * scale;
@@ -188,6 +254,7 @@
       link.click();
     });
 
+    // Initial draw
     draw();
   </script>
 </body>
