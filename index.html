@@ -48,7 +48,7 @@
       margin: 0 auto;
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght=600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="container">
@@ -107,7 +107,7 @@
       img.src = URL.createObjectURL(file);
     });
 
-    // Fit photo to the designated area
+    // Fit photo to the designated area (only for initial positioning)
     function fitPhotoToArea() {
       if (!uploadedPhoto) return;
       
@@ -150,13 +150,13 @@
         ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
         // Draw name text
-        ctx.font = "bold 53px 'Anek Malayalam'";
+        ctx.font = "bold 83px 'Anek Malayalam'";
         ctx.fillStyle = "#229b0f";
         ctx.textAlign = "center";
         ctx.fillText(document.getElementById('nameInput').value, namePos.x, namePos.y);
 
         // Draw caption text
-        ctx.font = "41px 'Anek Malayalam'";
+        ctx.font = "71px 'Anek Malayalam'";
         ctx.fillStyle = "black";
         ctx.fillText(document.getElementById('captionInput').value, captionPos.x, captionPos.y);
       };
@@ -211,10 +211,6 @@
         photoPos.x = x - dragOffset.x;
         photoPos.y = y - dragOffset.y;
         
-        // Keep photo within bounds
-        photoPos.x = Math.max(270, Math.min(photoPos.x, 270 + 1940 - photoPos.w));
-        photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
-        
         draw();
       } else if (e.touches.length === 2 && isPinching) {
         // Pinch zoom
@@ -225,22 +221,14 @@
         const newWidth = initialPhotoSize.w * scale;
         const newHeight = initialPhotoSize.h * scale;
         
-        // Apply constraints
-        const maxWidth = 1940;
-        const maxHeight = 2953;
-        
-        if (newWidth > 100 && newWidth < maxWidth * 2 && 
-            newHeight > 100 && newHeight < maxHeight * 2) {
+        // Only apply minimum constraint to prevent photo from becoming too small
+        if (newWidth > 50 && newHeight > 50) {
           photoPos.w = newWidth;
           photoPos.h = newHeight;
           
           // Adjust position to center the zoom
           photoPos.x = photoPos.x - (newWidth - initialPhotoSize.w) / 2;
           photoPos.y = photoPos.y - (newHeight - initialPhotoSize.h) / 2;
-          
-          // Keep within bounds
-          photoPos.x = Math.max(270, Math.min(photoPos.x, 270 + 1940 - photoPos.w));
-          photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
           
           draw();
         }
@@ -284,10 +272,6 @@
 
       photoPos.x = x - dragOffset.x;
       photoPos.y = y - dragOffset.y;
-      
-      // Keep photo within bounds
-      photoPos.x = Math.max(270, Math.min(photoPos.x, 270 + 1940 - photoPos.w));
-      photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
       
       draw();
     });
