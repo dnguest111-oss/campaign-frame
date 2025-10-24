@@ -83,11 +83,16 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     let uploadedPhoto = null;
-    let photoPos = { x: 290, y: 0, w: 1890, h: 2953 };
+    let photoPos = { x: 270, y: 0, w: 1940, h: 2953 };
     let draggingPhoto = false;
     let dragOffset = { x: 0, y: 0 };
-    const namePos = { x: 1240, y: 1720 };
-    const captionPos = { x: 1240, y: 1780 };
+    const namePos = { x: 1240, y: 1790 };
+    const captionPos = { x: 1240, y: 1850 };
+    
+    // Pinch zoom variables
+    let initialPinchDistance = 0;
+    let initialPhotoSize = { w: 0, h: 0 };
+    let isPinching = false;
 
     // Handle photo upload
     document.getElementById('photoInput').addEventListener('change', e => {
@@ -106,7 +111,7 @@
     function fitPhotoToArea() {
       if (!uploadedPhoto) return;
       
-      const areaWidth = 1890; // 2480 - 290*2
+      const areaWidth = 1940; // 2480 - 270*2
       const areaHeight = 2953;
       const imgAspect = uploadedPhoto.width / uploadedPhoto.height;
       const areaAspect = areaWidth / areaHeight;
@@ -115,13 +120,13 @@
         // Image is wider than area
         photoPos.w = areaWidth;
         photoPos.h = areaWidth / imgAspect;
-        photoPos.x = 290;
+        photoPos.x = 270;
         photoPos.y = (areaHeight - photoPos.h) / 2;
       } else {
         // Image is taller than area
         photoPos.h = areaHeight;
         photoPos.w = areaHeight * imgAspect;
-        photoPos.x = 290 + (areaWidth - photoPos.w) / 2;
+        photoPos.x = 270 + (areaWidth - photoPos.w) / 2;
         photoPos.y = 0;
       }
     }
@@ -145,58 +150,111 @@
         ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
         // Draw name text
-        ctx.font = "bold 48px 'Anek Malayalam'";
-        ctx.fillStyle = "black";
+        ctx.font = "bold 53px 'Anek Malayalam'";
+        ctx.fillStyle = "#229b0f";
         ctx.textAlign = "center";
         ctx.fillText(document.getElementById('nameInput').value, namePos.x, namePos.y);
 
         // Draw caption text
-        ctx.font = "36px 'Anek Malayalam'";
+        ctx.font = "41px 'Anek Malayalam'";
+        ctx.fillStyle = "black";
         ctx.fillText(document.getElementById('captionInput').value, captionPos.x, captionPos.y);
       };
+    }
+
+    // Calculate distance between two points
+    function getDistance(touch1, touch2) {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
     }
 
     // Touch event handlers for mobile
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      const touch = e.touches[0];
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const x = (touch.clientX - rect.left) * scaleX;
-      const y = (touch.clientY - rect.top) * scaleY;
+      
+      if (e.touches.length === 1) {
+        // Single touch - dragging
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (touch.clientX - rect.left) * scaleX;
+        const y = (touch.clientY - rect.top) * scaleY;
 
-      if (x > photoPos.x && x < photoPos.x + photoPos.w && 
-          y > photoPos.y && y < photoPos.y + photoPos.h) {
-        draggingPhoto = true;
-        dragOffset.x = x - photoPos.x;
-        dragOffset.y = y - photoPos.y;
+        if (x > photoPos.x && x < photoPos.x + photoPos.w && 
+            y > photoPos.y && y < photoPos.y + photoPos.h) {
+          draggingPhoto = true;
+          dragOffset.x = x - photoPos.x;
+          dragOffset.y = y - photoPos.y;
+        }
+      } else if (e.touches.length === 2) {
+        // Pinch zoom start
+        isPinching = true;
+        initialPinchDistance = getDistance(e.touches[0], e.touches[1]);
+        initialPhotoSize = { w: photoPos.w, h: photoPos.h };
       }
     });
 
     canvas.addEventListener('touchmove', (e) => {
       e.preventDefault();
-      if (!draggingPhoto) return;
       
-      const touch = e.touches[0];
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const x = (touch.clientX - rect.left) * scaleX;
-      const y = (touch.clientY - rect.top) * scaleY;
+      if (e.touches.length === 1 && draggingPhoto) {
+        // Single touch drag
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (touch.clientX - rect.left) * scaleX;
+        const y = (touch.clientY - rect.top) * scaleY;
 
-      photoPos.x = x - dragOffset.x;
-      photoPos.y = y - dragOffset.y;
-      
-      // Keep photo within bounds
-      photoPos.x = Math.max(290, Math.min(photoPos.x, 290 + 1890 - photoPos.w));
-      photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
-      
-      draw();
+        photoPos.x = x - dragOffset.x;
+        photoPos.y = y - dragOffset.y;
+        
+        // Keep photo within bounds
+        photoPos.x = Math.max(270, Math.min(photoPos.x, 270 + 1940 - photoPos.w));
+        photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
+        
+        draw();
+      } else if (e.touches.length === 2 && isPinching) {
+        // Pinch zoom
+        const currentDistance = getDistance(e.touches[0], e.touches[1]);
+        const scale = currentDistance / initialPinchDistance;
+        
+        // Calculate new dimensions
+        const newWidth = initialPhotoSize.w * scale;
+        const newHeight = initialPhotoSize.h * scale;
+        
+        // Apply constraints
+        const maxWidth = 1940;
+        const maxHeight = 2953;
+        
+        if (newWidth > 100 && newWidth < maxWidth * 2 && 
+            newHeight > 100 && newHeight < maxHeight * 2) {
+          photoPos.w = newWidth;
+          photoPos.h = newHeight;
+          
+          // Adjust position to center the zoom
+          photoPos.x = photoPos.x - (newWidth - initialPhotoSize.w) / 2;
+          photoPos.y = photoPos.y - (newHeight - initialPhotoSize.h) / 2;
+          
+          // Keep within bounds
+          photoPos.x = Math.max(270, Math.min(photoPos.x, 270 + 1940 - photoPos.w));
+          photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
+          
+          draw();
+        }
+      }
     });
 
-    canvas.addEventListener('touchend', () => {
+    canvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
       draggingPhoto = false;
+      
+      // Reset pinch state when all fingers are lifted
+      if (e.touches.length === 0) {
+        isPinching = false;
+      }
     });
 
     // Mouse event handlers for desktop
@@ -228,7 +286,7 @@
       photoPos.y = y - dragOffset.y;
       
       // Keep photo within bounds
-      photoPos.x = Math.max(290, Math.min(photoPos.x, 290 + 1890 - photoPos.w));
+      photoPos.x = Math.max(270, Math.min(photoPos.x, 270 + 1940 - photoPos.w));
       photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
       
       draw();
@@ -259,4 +317,3 @@
   </script>
 </body>
 </html>
-
