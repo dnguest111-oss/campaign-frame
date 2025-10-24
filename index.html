@@ -69,6 +69,34 @@
   </div>
 
   <script>
+    // Font and text configuration - CHANGE VALUES HERE
+    const FONT_CONFIG = {
+      nameSize: 113,      // Name font size in pixels
+      captionSize: 101,  // Caption font size in pixels
+      lineGap: 50,       // Gap between name and caption in pixels
+      textAreaTop: 1730, // Top of text area
+      textAreaBottom: 2000, // Bottom of text area
+      textX: 1240        // Horizontal center position
+    };
+
+    // Calculate text positions based on configuration
+    function calculateTextPositions() {
+      const totalTextHeight = FONT_CONFIG.nameSize + FONT_CONFIG.lineGap + FONT_CONFIG.captionSize;
+      const textAreaHeight = FONT_CONFIG.textAreaBottom - FONT_CONFIG.textAreaTop;
+      const startPosition = FONT_CONFIG.textAreaTop + (textAreaHeight - totalTextHeight) / 2;
+      
+      return {
+        name: { 
+          x: FONT_CONFIG.textX, 
+          y: startPosition + FONT_CONFIG.nameSize 
+        },
+        caption: { 
+          x: FONT_CONFIG.textX, 
+          y: startPosition + FONT_CONFIG.nameSize + FONT_CONFIG.lineGap + FONT_CONFIG.captionSize 
+        }
+      };
+    }
+
     // Load the font explicitly
     document.fonts.ready.then(function() {
       console.log('All fonts have loaded');
@@ -95,8 +123,9 @@
     let photoPos = { x: 270, y: 0, w: 1940, h: 2953 };
     let draggingPhoto = false;
     let dragOffset = { x: 0, y: 0 };
-    const namePos = { x: 1240, y: 1800 };
-    const captionPos = { x: 1240, y: 1920 };
+    
+    // Calculate text positions
+    let textPositions = calculateTextPositions();
     
     // Pinch zoom variables
     let initialPinchDistance = 0;
@@ -145,6 +174,9 @@
     document.getElementById('captionInput').addEventListener('input', draw);
 
     function draw() {
+      // Recalculate positions in case config changed
+      textPositions = calculateTextPositions();
+      
       const frameName = select.value;
       const frameImg = new Image();
       frameImg.src = `frames/${frameName}.png`;
@@ -159,15 +191,15 @@
         ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
         // Draw name text
-        ctx.font = "bold 113px 'Anek Malayalam', sans-serif";
+        ctx.font = `bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif`;
         ctx.fillStyle = "#229b0f";
         ctx.textAlign = "center";
-        ctx.fillText(document.getElementById('nameInput').value, namePos.x, namePos.y);
+        ctx.fillText(document.getElementById('nameInput').value, textPositions.name.x, textPositions.name.y);
 
         // Draw caption text
-        ctx.font = "101px 'Anek Malayalam', sans-serif";
+        ctx.font = `${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif`;
         ctx.fillStyle = "black";
-        ctx.fillText(document.getElementById('captionInput').value, captionPos.x, captionPos.y);
+        ctx.fillText(document.getElementById('captionInput').value, textPositions.caption.x, textPositions.caption.y);
       };
     }
 
@@ -315,13 +347,17 @@
       tempCanvas.width = canvas.width * scale;
       tempCanvas.height = canvas.height * scale;
       const tempCtx = tempCanvas.getContext('2d');
-      tempCtx.scale(scale, scale);
-      tempCtx.drawImage(canvas, 0, 0);
+      
+      // Wait for fonts to be loaded before drawing
+      document.fonts.ready.then(() => {
+        // Draw the current canvas to the temporary canvas
+        tempCtx.drawImage(canvas, 0, 0);
 
-      const link = document.createElement('a');
-      link.download = `${nameText}-${frameText}.png`;
-      link.href = tempCanvas.toDataURL("image/png");
-      link.click();
+        const link = document.createElement('a');
+        link.download = `${nameText}-${frameText}.png`;
+        link.href = tempCanvas.toDataURL("image/png");
+        link.click();
+      });
     });
 
     // Initial draw
