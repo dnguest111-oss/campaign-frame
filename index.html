@@ -83,7 +83,7 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     let uploadedPhoto = null;
-    let photoPos = { x: 295, y: 0, w: 1890, h: 2953 };
+    let photoPos = { x: 290, y: 0, w: 1890, h: 2953 };
     let draggingPhoto = false;
     let dragOffset = { x: 0, y: 0 };
     const namePos = { x: 1240, y: 1720 };
@@ -106,7 +106,7 @@
     function fitPhotoToArea() {
       if (!uploadedPhoto) return;
       
-      const areaWidth = 1890; // 2480 - 295*2
+      const areaWidth = 1890; // 2480 - 290*2
       const areaHeight = 2953;
       const imgAspect = uploadedPhoto.width / uploadedPhoto.height;
       const areaAspect = areaWidth / areaHeight;
@@ -115,13 +115,13 @@
         // Image is wider than area
         photoPos.w = areaWidth;
         photoPos.h = areaWidth / imgAspect;
-        photoPos.x = 295;
+        photoPos.x = 290;
         photoPos.y = (areaHeight - photoPos.h) / 2;
       } else {
         // Image is taller than area
         photoPos.h = areaHeight;
         photoPos.w = areaHeight * imgAspect;
-        photoPos.x = 295 + (areaWidth - photoPos.w) / 2;
+        photoPos.x = 290 + (areaWidth - photoPos.w) / 2;
         photoPos.y = 0;
       }
     }
@@ -189,7 +189,7 @@
       photoPos.y = y - dragOffset.y;
       
       // Keep photo within bounds
-      photoPos.x = Math.max(295, Math.min(photoPos.x, 295 + 1890 - photoPos.w));
+      photoPos.x = Math.max(290, Math.min(photoPos.x, 290 + 1890 - photoPos.w));
       photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
       
       draw();
@@ -228,7 +228,7 @@
       photoPos.y = y - dragOffset.y;
       
       // Keep photo within bounds
-      photoPos.x = Math.max(295, Math.min(photoPos.x, 295 + 1890 - photoPos.w));
+      photoPos.x = Math.max(290, Math.min(photoPos.x, 290 + 1890 - photoPos.w));
       photoPos.y = Math.max(0, Math.min(photoPos.y, 2953 - photoPos.h));
       
       draw();
@@ -259,3 +259,4 @@
   </script>
 </body>
 </html>
+
