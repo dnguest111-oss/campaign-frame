@@ -48,7 +48,8 @@
       margin: 0 auto;
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght=600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="container">
@@ -150,13 +151,13 @@
         ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
         // Draw name text
-        ctx.font = "bold 83px 'Anek Malayalam'";
+        ctx.font = "bold 133px 'Anek Malayalam', 'Noto Sans Malayalam', sans-serif";
         ctx.fillStyle = "#229b0f";
         ctx.textAlign = "center";
         ctx.fillText(document.getElementById('nameInput').value, namePos.x, namePos.y);
 
         // Draw caption text
-        ctx.font = "71px 'Anek Malayalam'";
+        ctx.font = "121px 'Anek Malayalam', 'Noto Sans Malayalam', sans-serif";
         ctx.fillStyle = "black";
         ctx.fillText(document.getElementById('captionInput').value, captionPos.x, captionPos.y);
       };
@@ -211,6 +212,10 @@
         photoPos.x = x - dragOffset.x;
         photoPos.y = y - dragOffset.y;
         
+        // Ensure photo stays within canvas bounds
+        photoPos.x = Math.max(0, Math.min(photoPos.x, canvas.width - photoPos.w));
+        photoPos.y = Math.max(0, Math.min(photoPos.y, canvas.height - photoPos.h));
+        
         draw();
       } else if (e.touches.length === 2 && isPinching) {
         // Pinch zoom
@@ -223,12 +228,21 @@
         
         // Only apply minimum constraint to prevent photo from becoming too small
         if (newWidth > 50 && newHeight > 50) {
+          // Calculate the center point of the photo
+          const centerX = photoPos.x + photoPos.w / 2;
+          const centerY = photoPos.y + photoPos.h / 2;
+          
+          // Update dimensions
           photoPos.w = newWidth;
           photoPos.h = newHeight;
           
-          // Adjust position to center the zoom
-          photoPos.x = photoPos.x - (newWidth - initialPhotoSize.w) / 2;
-          photoPos.y = photoPos.y - (newHeight - initialPhotoSize.h) / 2;
+          // Adjust position to keep the center point fixed
+          photoPos.x = centerX - photoPos.w / 2;
+          photoPos.y = centerY - photoPos.h / 2;
+          
+          // Ensure photo stays within canvas bounds
+          photoPos.x = Math.max(0, Math.min(photoPos.x, canvas.width - photoPos.w));
+          photoPos.y = Math.max(0, Math.min(photoPos.y, canvas.height - photoPos.h));
           
           draw();
         }
@@ -273,6 +287,10 @@
       photoPos.x = x - dragOffset.x;
       photoPos.y = y - dragOffset.y;
       
+      // Ensure photo stays within canvas bounds
+      photoPos.x = Math.max(0, Math.min(photoPos.x, canvas.width - photoPos.w));
+      photoPos.y = Math.max(0, Math.min(photoPos.y, canvas.height - photoPos.h));
+      
       draw();
     });
 
@@ -282,6 +300,8 @@
 
     // High resolution download
     document.getElementById('downloadBtn').addEventListener('click', () => {
+      const nameText = document.getElementById('nameInput').value || "name";
+      const frameText = select.value.toLowerCase();
       const scale = 1;
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = canvas.width * scale;
@@ -291,7 +311,7 @@
       tempCtx.drawImage(canvas, 0, 0);
 
       const link = document.createElement('a');
-      link.download = `${select.value}-campaign.png`;
+      link.download = `${nameText}-${frameText}.png`;
       link.href = tempCanvas.toDataURL("image/png");
       link.click();
     });
