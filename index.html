@@ -21,6 +21,8 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       touch-action: none;
       cursor: grab;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
     }
     .controls {
       margin-top: 20px;
@@ -182,24 +184,46 @@
       frameImg.src = `frames/${frameName}.png`;
 
       frameImg.onload = () => {
+        // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+        
+        // Set canvas properties for consistent rendering
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
+        // Draw photo if available
         if (uploadedPhoto) {
           ctx.drawImage(uploadedPhoto, photoPos.x, photoPos.y, photoPos.w, photoPos.h);
         }
 
+        // Draw frame
         ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
-        // Draw name text
-        ctx.font = `bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif`;
-        ctx.fillStyle = "#229b0f";
-        ctx.textAlign = "center";
-        ctx.fillText(document.getElementById('nameInput').value, textPositions.name.x, textPositions.name.y);
+        // Draw name text with consistent alignment
+        const nameText = document.getElementById('nameInput').value;
+        if (nameText) {
+          ctx.font = `bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif`;
+          ctx.fillStyle = "#229b0f";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "alphabetic";
+          
+          // Ensure font is rendered consistently
+          ctx.direction = "ltr";
+          ctx.fillText(nameText, textPositions.name.x, textPositions.name.y);
+        }
 
-        // Draw caption text
-        ctx.font = `${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif`;
-        ctx.fillStyle = "black";
-        ctx.fillText(document.getElementById('captionInput').value, textPositions.caption.x, textPositions.caption.y);
+        // Draw caption text with consistent alignment
+        const captionText = document.getElementById('captionInput').value;
+        if (captionText) {
+          ctx.font = `${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif`;
+          ctx.fillStyle = "black";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "alphabetic";
+          
+          // Ensure font is rendered consistently
+          ctx.direction = "ltr";
+          ctx.fillText(captionText, textPositions.caption.x, textPositions.caption.y);
+        }
       };
     }
 
@@ -347,6 +371,10 @@
       tempCanvas.width = canvas.width * scale;
       tempCanvas.height = canvas.height * scale;
       const tempCtx = tempCanvas.getContext('2d');
+      
+      // Set the same properties for consistent rendering
+      tempCtx.imageSmoothingEnabled = true;
+      tempCtx.imageSmoothingQuality = 'high';
       
       // Wait for fonts to be loaded before drawing
       document.fonts.ready.then(() => {
