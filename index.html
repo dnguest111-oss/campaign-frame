@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Frame KSD Campaign Maker</title>
-<style>
+  <style>
     @import url('https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600;700&family=Inter:wght@500;600;700&display=swap');
     
     * {
@@ -174,26 +174,44 @@
 </head>
 <body>
   <div class="container">
-    <h2>🖼 Frame KSD Campaign Maker</h2>
-    <canvas id="canvas" width="2480" height="2953"></canvas>
+    <h2><span class="emoji">🖼️</span> Frame KSD Campaign Maker</h2>
+    
+    <div class="canvas-wrapper">
+      <canvas id="canvas" width="2480" height="2953"></canvas>
+    </div>
 
     <div class="controls">
-      <label>Choose Frame:</label>
-      <select id="frameSelect"></select>
-      <input type="file" id="photoInput" accept="image/*">
-      <input type="text" id="nameInput" placeholder="Enter Name">
-      <input type="text" id="captionInput" placeholder="Enter Caption">
-      <button id="downloadBtn">Download</button>
+      <div class="input-group">
+        <label>📍 Choose Frame</label>
+        <select id="frameSelect"></select>
+      </div>
+      
+      <div class="input-group">
+        <label>📷 Upload Photo</label>
+        <input type="file" id="photoInput" accept="image/*">
+      </div>
+      
+      <div class="input-group">
+        <label>✍️ Enter Name</label>
+        <input type="text" id="nameInput" placeholder="Your name here...">
+      </div>
+      
+      <div class="input-group">
+        <label>💬 Enter Caption</label>
+        <input type="text" id="captionInput" placeholder="Your caption here...">
+      </div>
+      
+      <button id="downloadBtn">⬇️ Download Image</button>
     </div>
   </div>
 
   <script>
     // Font and text configuration - CHANGE VALUES HERE
     const FONT_CONFIG = {
-      nameSize: 90,      // Name font size in pixels
-      captionSize: 70,  // Caption font size in pixels
-      lineGap: 20,       // Gap between name and caption in pixels
-      textAreaTop: 1700, // Top of text area
+      nameSize: 113,      // Name font size in pixels
+      captionSize: 101,  // Caption font size in pixels
+      lineGap: 50,       // Gap between name and caption in pixels
+      textAreaTop: 1730, // Top of text area
       textAreaBottom: 2000, // Bottom of text area
       textX: 1240        // Horizontal center position
     };
@@ -298,7 +316,7 @@
       
       const frameName = select.value;
       const frameImg = new Image();
-      frameImg.src = frames/${frameName}.png;
+      frameImg.src = `frames/${frameName}.png`;
 
       frameImg.onload = () => {
         // Clear canvas
@@ -319,7 +337,7 @@
         // Draw name text with consistent alignment
         const nameText = document.getElementById('nameInput').value;
         if (nameText) {
-          ctx.font = bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif;
+          ctx.font = `bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif`;
           ctx.fillStyle = "#229b0f";
           ctx.textAlign = "center";
           ctx.textBaseline = "alphabetic";
@@ -332,7 +350,7 @@
         // Draw caption text with consistent alignment
         const captionText = document.getElementById('captionInput').value;
         if (captionText) {
-          ctx.font = ${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif;
+          ctx.font = `${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif`;
           ctx.fillStyle = "black";
           ctx.textAlign = "center";
           ctx.textBaseline = "alphabetic";
@@ -499,7 +517,7 @@
         tempCtx.drawImage(canvas, 0, 0);
 
         const link = document.createElement('a');
-        link.download = ${nameText}-${frameText}.png;
+        link.download = `${nameText}-${frameText}.png`;
         link.href = tempCanvas.toDataURL("image/png");
         link.click();
       });
