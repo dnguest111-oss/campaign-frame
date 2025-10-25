@@ -181,7 +181,7 @@
       
       const frameName = select.value;
       const frameImg = new Image();
-      frameImg.src = frames/${frameName}.png;
+      frameImg.src = `frames/${frameName}.png`;
 
       frameImg.onload = () => {
         // Clear canvas
@@ -393,3 +393,4 @@
   </script>
 </body>
 </html>
+
