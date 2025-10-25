@@ -1,400 +1,167 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Frame KSD Campaign Maker</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600&display=swap');
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600;700&family=Inter:wght@500;600;700&display=swap');
+    
+    * {
+      box-sizing: border-box;
+    }
     
     body {
-      font-family: "Anek Malayalam", sans-serif;
+      font-family: "Inter", "Anek Malayalam", sans-serif;
       text-align: center;
-      background: #f7f7f7;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       margin: 0;
-      padding: 10px;
+      padding: 20px 10px;
       overflow-x: hidden;
+      min-height: 100vh;
     }
+    
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+    }
+    
+    h2 {
+      color: white;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 25px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      letter-spacing: -0.5px;
+    }
+    
+    .canvas-wrapper {
+      background: white;
+      border-radius: 20px;
+      padding: 15px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      margin-bottom: 25px;
+    }
+    
     canvas {
       max-width: 100%;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       touch-action: none;
       cursor: grab;
       image-rendering: -webkit-optimize-contrast;
       image-rendering: crisp-edges;
+      display: block;
     }
+    
+    canvas:active {
+      cursor: grabbing;
+    }
+    
     .controls {
-      margin-top: 20px;
-      padding: 0 10px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
-    select, input, button {
-      margin: 8px 0;
-      padding: 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+    
+    .input-group {
+      margin-bottom: 18px;
+    }
+    
+    .input-group label {
+      display: block;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      color: #4a5568;
+      margin-bottom: 8px;
+      padding-left: 5px;
+    }
+    
+    select, input[type="text"] {
       width: 100%;
-      max-width: 300px;
-      box-sizing: border-box;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
       font-size: 16px;
       font-family: "Anek Malayalam", sans-serif;
       font-weight: 600;
+      transition: all 0.3s ease;
+      background: white;
+      color: #2d3748;
     }
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
+    
+    select:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    input[type="file"] {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 2px dashed #cbd5e0;
+      font-size: 14px;
+      font-family: "Inter", sans-serif;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background: #f7fafc;
       cursor: pointer;
+      color: #4a5568;
     }
+    
+    input[type="file"]:hover {
+      border-color: #667eea;
+      background: #edf2f7;
+    }
+    
+    button {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      font-family: "Inter", sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      margin-top: 8px;
+    }
+    
     button:hover {
-      background-color: #45a049;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
     }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .emoji {
+      font-size: 32px;
+      display: inline-block;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @media (max-width: 600px) {
+      body {
+        padding: 15px 10px;
+      }
+      
+      h2 {
+        font-size: 24px;
+      }
+      
+      .canvas-wrapper {
+        padding: 10px;
+      }
+      
+      .controls {
+        padding: 20px 15px;
+      }
     }
   </style>
-</head>
-<body>
-  <div class="container">
-    <h2>🖼️ Frame KSD Campaign Maker</h2>
-    <canvas id="canvas" width="2480" height="2953"></canvas>
-
-    <div class="controls">
-      <label>Choose Frame:</label>
-      <select id="frameSelect"></select>
-      <input type="file" id="photoInput" accept="image/*">
-      <input type="text" id="nameInput" placeholder="Enter Name">
-      <input type="text" id="captionInput" placeholder="Enter Caption">
-      <button id="downloadBtn">Download</button>
-    </div>
-  </div>
-
-  <script>
-    // Font and text configuration - CHANGE VALUES HERE
-    const FONT_CONFIG = {
-      nameSize: 90,      // Name font size in pixels
-      captionSize: 70,  // Caption font size in pixels
-      lineGap: 20,       // Gap between name and caption in pixels
-      textAreaTop: 1700, // Top of text area
-      textAreaBottom: 2000, // Bottom of text area
-      textX: 1240        // Horizontal center position
-    };
-
-    // Calculate text positions based on configuration
-    function calculateTextPositions() {
-      const totalTextHeight = FONT_CONFIG.nameSize + FONT_CONFIG.lineGap + FONT_CONFIG.captionSize;
-      const textAreaHeight = FONT_CONFIG.textAreaBottom - FONT_CONFIG.textAreaTop;
-      const startPosition = FONT_CONFIG.textAreaTop + (textAreaHeight - totalTextHeight) / 2;
-      
-      return {
-        name: { 
-          x: FONT_CONFIG.textX, 
-          y: startPosition + FONT_CONFIG.nameSize 
-        },
-        caption: { 
-          x: FONT_CONFIG.textX, 
-          y: startPosition + FONT_CONFIG.nameSize + FONT_CONFIG.lineGap + FONT_CONFIG.captionSize 
-        }
-      };
-    }
-
-    // Load the font explicitly
-    document.fonts.ready.then(function() {
-      console.log('All fonts have loaded');
-      draw();
-    });
-
-    const frames = [
-      "KASARAGOD","CHERKALA","MANJESHWERAM","KUMBALA","BADIYADUKKA","MULLERIA",
-      "UDUMA","CHATTANCHAL","KANHANGAD","KALLAR","PARAPPA","TRIKARIPUR",
-      "NILESHWARAM","CHERUVATHUR","PERUMBATTA"
-    ];
-
-    const select = document.getElementById('frameSelect');
-    frames.forEach(f => {
-      const opt = document.createElement('option');
-      opt.value = f;
-      opt.textContent = f;
-      select.appendChild(opt);
-    });
-
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let uploadedPhoto = null;
-    let photoPos = { x: 270, y: 0, w: 1940, h: 2953 };
-    let draggingPhoto = false;
-    let dragOffset = { x: 0, y: 0 };
-    
-    // Calculate text positions
-    let textPositions = calculateTextPositions();
-    
-    // Pinch zoom variables
-    let initialPinchDistance = 0;
-    let initialPhotoSize = { w: 0, h: 0 };
-    let isPinching = false;
-
-    // Handle photo upload
-    document.getElementById('photoInput').addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const img = new Image();
-      img.onload = () => {
-        uploadedPhoto = img;
-        fitPhotoToArea();
-        draw();
-      };
-      img.src = URL.createObjectURL(file);
-    });
-
-    // Fit photo to the designated area (only for initial positioning)
-    function fitPhotoToArea() {
-      if (!uploadedPhoto) return;
-      
-      const areaWidth = 1940; // 2480 - 270*2
-      const areaHeight = 2953;
-      const imgAspect = uploadedPhoto.width / uploadedPhoto.height;
-      const areaAspect = areaWidth / areaHeight;
-      
-      if (imgAspect > areaAspect) {
-        // Image is wider than area
-        photoPos.w = areaWidth;
-        photoPos.h = areaWidth / imgAspect;
-        photoPos.x = 270;
-        photoPos.y = (areaHeight - photoPos.h) / 2;
-      } else {
-        // Image is taller than area
-        photoPos.h = areaHeight;
-        photoPos.w = areaHeight * imgAspect;
-        photoPos.x = 270 + (areaWidth - photoPos.w) / 2;
-        photoPos.y = 0;
-      }
-    }
-
-    select.addEventListener('change', draw);
-    document.getElementById('nameInput').addEventListener('input', draw);
-    document.getElementById('captionInput').addEventListener('input', draw);
-
-    function draw() {
-      // Recalculate positions in case config changed
-      textPositions = calculateTextPositions();
-      
-      const frameName = select.value;
-      const frameImg = new Image();
-      frameImg.src = `frames/${frameName}.png`;
-
-      frameImg.onload = () => {
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Set canvas properties for consistent rendering
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        
-        // Draw photo if available
-        if (uploadedPhoto) {
-          ctx.drawImage(uploadedPhoto, photoPos.x, photoPos.y, photoPos.w, photoPos.h);
-        }
-
-        // Draw frame
-        ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
-
-        // Draw name text with consistent alignment
-        const nameText = document.getElementById('nameInput').value;
-        if (nameText) {
-          ctx.font = `bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif`;
-          ctx.fillStyle = "#229b0f";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "alphabetic";
-          
-          // Ensure font is rendered consistently
-          ctx.direction = "ltr";
-          ctx.fillText(nameText, textPositions.name.x, textPositions.name.y);
-        }
-
-        // Draw caption text with consistent alignment
-        const captionText = document.getElementById('captionInput').value;
-        if (captionText) {
-          ctx.font = `${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif`;
-          ctx.fillStyle = "black";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "alphabetic";
-          
-          // Ensure font is rendered consistently
-          ctx.direction = "ltr";
-          ctx.fillText(captionText, textPositions.caption.x, textPositions.caption.y);
-        }
-      };
-    }
-
-    // Calculate distance between two points
-    function getDistance(touch1, touch2) {
-      const dx = touch1.clientX - touch2.clientX;
-      const dy = touch1.clientY - touch2.clientY;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    // Touch event handlers for mobile
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      
-      if (e.touches.length === 1) {
-        // Single touch - dragging
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (touch.clientX - rect.left) * scaleX;
-        const y = (touch.clientY - rect.top) * scaleY;
-
-        if (x > photoPos.x && x < photoPos.x + photoPos.w && 
-            y > photoPos.y && y < photoPos.y + photoPos.h) {
-          draggingPhoto = true;
-          dragOffset.x = x - photoPos.x;
-          dragOffset.y = y - photoPos.y;
-        }
-      } else if (e.touches.length === 2) {
-        // Pinch zoom start
-        isPinching = true;
-        initialPinchDistance = getDistance(e.touches[0], e.touches[1]);
-        initialPhotoSize = { w: photoPos.w, h: photoPos.h };
-      }
-    });
-
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      
-      if (e.touches.length === 1 && draggingPhoto) {
-        // Single touch drag
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (touch.clientX - rect.left) * scaleX;
-        const y = (touch.clientY - rect.top) * scaleY;
-
-        photoPos.x = x - dragOffset.x;
-        photoPos.y = y - dragOffset.y;
-        
-        // Ensure photo stays within canvas bounds
-        photoPos.x = Math.max(0, Math.min(photoPos.x, canvas.width - photoPos.w));
-        photoPos.y = Math.max(0, Math.min(photoPos.y, canvas.height - photoPos.h));
-        
-        draw();
-      } else if (e.touches.length === 2 && isPinching) {
-        // Pinch zoom
-        const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        const scale = currentDistance / initialPinchDistance;
-        
-        // Calculate new dimensions
-        const newWidth = initialPhotoSize.w * scale;
-        const newHeight = initialPhotoSize.h * scale;
-        
-        // Only apply minimum constraint to prevent photo from becoming too small
-        if (newWidth > 50 && newHeight > 50) {
-          // Calculate the center point of the photo
-          const centerX = photoPos.x + photoPos.w / 2;
-          const centerY = photoPos.y + photoPos.h / 2;
-          
-          // Update dimensions
-          photoPos.w = newWidth;
-          photoPos.h = newHeight;
-          
-          // Adjust position to keep the center point fixed
-          photoPos.x = centerX - photoPos.w / 2;
-          photoPos.y = centerY - photoPos.h / 2;
-          
-          // Ensure photo stays within canvas bounds
-          photoPos.x = Math.max(0, Math.min(photoPos.x, canvas.width - photoPos.w));
-          photoPos.y = Math.max(0, Math.min(photoPos.y, canvas.height - photoPos.h));
-          
-          draw();
-        }
-      }
-    });
-
-    canvas.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      draggingPhoto = false;
-      
-      // Reset pinch state when all fingers are lifted
-      if (e.touches.length === 0) {
-        isPinching = false;
-      }
-    });
-
-    // Mouse event handlers for desktop
-    canvas.addEventListener('mousedown', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const x = (e.clientX - rect.left) * scaleX;
-      const y = (e.clientY - rect.top) * scaleY;
-
-      if (x > photoPos.x && x < photoPos.x + photoPos.w && 
-          y > photoPos.y && y < photoPos.y + photoPos.h) {
-        draggingPhoto = true;
-        dragOffset.x = x - photoPos.x;
-        dragOffset.y = y - photoPos.y;
-      }
-    });
-
-    canvas.addEventListener('mousemove', (e) => {
-      if (!draggingPhoto) return;
-      
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const x = (e.clientX - rect.left) * scaleX;
-      const y = (e.clientY - rect.top) * scaleY;
-
-      photoPos.x = x - dragOffset.x;
-      photoPos.y = y - dragOffset.y;
-      
-      // Ensure photo stays within canvas bounds
-      photoPos.x = Math.max(0, Math.min(photoPos.x, canvas.width - photoPos.w));
-      photoPos.y = Math.max(0, Math.min(photoPos.y, canvas.height - photoPos.h));
-      
-      draw();
-    });
-
-    canvas.addEventListener('mouseup', () => {
-      draggingPhoto = false;
-    });
-
-    // High resolution download
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      const nameText = document.getElementById('nameInput').value || "name";
-      const frameText = select.value.toLowerCase();
-      const scale = 1;
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = canvas.width * scale;
-      tempCanvas.height = canvas.height * scale;
-      const tempCtx = tempCanvas.getContext('2d');
-      
-      // Set the same properties for consistent rendering
-      tempCtx.imageSmoothingEnabled = true;
-      tempCtx.imageSmoothingQuality = 'high';
-      
-      // Wait for fonts to be loaded before drawing
-      document.fonts.ready.then(() => {
-        // Draw the current canvas to the temporary canvas
-        tempCtx.drawImage(canvas, 0, 0);
-
-        const link = document.createElement('a');
-        link.download = `${nameText}-${frameText}.png`;
-        link.href = tempCanvas.toDataURL("image/png");
-        link.click();
-      });
-    });
-
-    // Initial draw
-    draw();
-  </script>
-</body>
-</html>
-
-
-
-
-
