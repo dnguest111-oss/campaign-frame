@@ -57,7 +57,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>🖼 Frame KSD Campaign Maker</h2>
+    <h2>🖼️ Frame KSD Campaign Maker</h2>
     <canvas id="canvas" width="2480" height="2953"></canvas>
 
     <div class="controls">
@@ -73,10 +73,10 @@
   <script>
     // Font and text configuration - CHANGE VALUES HERE
     const FONT_CONFIG = {
-      nameSize: 90,      // Name font size in pixels
-      captionSize: 70,  // Caption font size in pixels
-      lineGap: 20,       // Gap between name and caption in pixels
-      textAreaTop: 1700, // Top of text area
+      nameSize: 113,      // Name font size in pixels
+      captionSize: 101,  // Caption font size in pixels
+      lineGap: 50,       // Gap between name and caption in pixels
+      textAreaTop: 1730, // Top of text area
       textAreaBottom: 2000, // Bottom of text area
       textX: 1240        // Horizontal center position
     };
@@ -202,7 +202,7 @@
         // Draw name text with consistent alignment
         const nameText = document.getElementById('nameInput').value;
         if (nameText) {
-          ctx.font = bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif;
+          ctx.font = `bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif`;
           ctx.fillStyle = "#229b0f";
           ctx.textAlign = "center";
           ctx.textBaseline = "alphabetic";
@@ -215,7 +215,7 @@
         // Draw caption text with consistent alignment
         const captionText = document.getElementById('captionInput').value;
         if (captionText) {
-          ctx.font = ${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif;
+          ctx.font = `${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif`;
           ctx.fillStyle = "black";
           ctx.textAlign = "center";
           ctx.textBaseline = "alphabetic";
@@ -382,7 +382,7 @@
         tempCtx.drawImage(canvas, 0, 0);
 
         const link = document.createElement('a');
-        link.download = ${nameText}-${frameText}.png;
+        link.download = `${nameText}-${frameText}.png`;
         link.href = tempCanvas.toDataURL("image/png");
         link.click();
       });
@@ -393,4 +393,3 @@
   </script>
 </body>
 </html>
-
