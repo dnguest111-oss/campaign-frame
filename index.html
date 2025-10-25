@@ -5,213 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Frame KSD Campaign Maker</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600;700&family=Inter:wght@500;600;700&display=swap');
-    
-    * {
-      box-sizing: border-box;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@600&display=swap');
     
     body {
-      font-family: "Inter", "Anek Malayalam", sans-serif;
+      font-family: "Anek Malayalam", sans-serif;
       text-align: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #f7f7f7;
       margin: 0;
-      padding: 20px 10px;
+      padding: 10px;
       overflow-x: hidden;
-      min-height: 100vh;
     }
-    
-    .container {
-      max-width: 650px;
-      margin: 0 auto;
-    }
-    
-    h2 {
-      color: white;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 25px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      letter-spacing: -0.5px;
-    }
-    
-    .canvas-wrapper {
-      background: white;
-      border-radius: 20px;
-      padding: 15px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      margin-bottom: 25px;
-    }
-    
     canvas {
       max-width: 100%;
       border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       touch-action: none;
       cursor: grab;
       image-rendering: -webkit-optimize-contrast;
       image-rendering: crisp-edges;
-      display: block;
     }
-    
-    canvas:active {
-      cursor: grabbing;
-    }
-    
     .controls {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 25px 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      margin-top: 20px;
+      padding: 0 10px;
     }
-    
-    .input-group {
-      margin-bottom: 18px;
-    }
-    
-    .input-group label {
-      display: block;
-      text-align: left;
-      font-weight: 600;
-      font-size: 14px;
-      color: #4a5568;
-      margin-bottom: 8px;
-      padding-left: 5px;
-    }
-    
-    select, input[type="text"] {
+    select, input, button {
+      margin: 8px 0;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
       width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 2px solid #e2e8f0;
+      max-width: 300px;
+      box-sizing: border-box;
       font-size: 16px;
       font-family: "Anek Malayalam", sans-serif;
       font-weight: 600;
-      transition: all 0.3s ease;
-      background: white;
-      color: #2d3748;
     }
-    
-    select:focus, input[type="text"]:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-    
-    input[type="file"] {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 2px dashed #cbd5e0;
-      font-size: 14px;
-      font-family: "Inter", sans-serif;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      background: #f7fafc;
-      cursor: pointer;
-      color: #4a5568;
-    }
-    
-    input[type="file"]:hover {
-      border-color: #667eea;
-      background: #edf2f7;
-    }
-    
     button {
-      width: 100%;
-      padding: 16px;
-      border-radius: 12px;
-      border: none;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-color: #4CAF50;
       color: white;
-      font-size: 18px;
-      font-weight: 700;
-      font-family: "Inter", sans-serif;
+      border: none;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-      margin-top: 8px;
     }
-    
     button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+      background-color: #45a049;
     }
-    
-    button:active {
-      transform: translateY(0);
-    }
-    
-    .emoji {
-      font-size: 32px;
-      display: inline-block;
-      animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    
-    @media (max-width: 600px) {
-      body {
-        padding: 15px 10px;
-      }
-      
-      h2 {
-        font-size: 24px;
-      }
-      
-      .canvas-wrapper {
-        padding: 10px;
-      }
-      
-      .controls {
-        padding: 20px 15px;
-      }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2><span class="emoji">🖼️</span> Frame KSD Campaign Maker</h2>
-    
-    <div class="canvas-wrapper">
-      <canvas id="canvas" width="2480" height="2953"></canvas>
-    </div>
+    <h2>🖼 Frame KSD Campaign Maker</h2>
+    <canvas id="canvas" width="2480" height="2953"></canvas>
 
     <div class="controls">
-      <div class="input-group">
-        <label>📍 Choose Frame</label>
-        <select id="frameSelect"></select>
-      </div>
-      
-      <div class="input-group">
-        <label>📷 Upload Photo</label>
-        <input type="file" id="photoInput" accept="image/*">
-      </div>
-      
-      <div class="input-group">
-        <label>✍️ Enter Name</label>
-        <input type="text" id="nameInput" placeholder="Your name here...">
-      </div>
-      
-      <div class="input-group">
-        <label>💬 Enter Caption</label>
-        <input type="text" id="captionInput" placeholder="Your caption here...">
-      </div>
-      
-      <button id="downloadBtn">⬇️ Download Image</button>
+      <label>Choose Frame:</label>
+      <select id="frameSelect"></select>
+      <input type="file" id="photoInput" accept="image/*">
+      <input type="text" id="nameInput" placeholder="Enter Name">
+      <input type="text" id="captionInput" placeholder="Enter Caption">
+      <button id="downloadBtn">Download</button>
     </div>
   </div>
 
   <script>
     // Font and text configuration - CHANGE VALUES HERE
     const FONT_CONFIG = {
-      nameSize: 113,      // Name font size in pixels
-      captionSize: 101,  // Caption font size in pixels
-      lineGap: 50,       // Gap between name and caption in pixels
-      textAreaTop: 1730, // Top of text area
+      nameSize: 90,      // Name font size in pixels
+      captionSize: 70,  // Caption font size in pixels
+      lineGap: 20,       // Gap between name and caption in pixels
+      textAreaTop: 1700, // Top of text area
       textAreaBottom: 2000, // Bottom of text area
       textX: 1240        // Horizontal center position
     };
@@ -316,7 +181,7 @@
       
       const frameName = select.value;
       const frameImg = new Image();
-      frameImg.src = `frames/${frameName}.png`;
+      frameImg.src = frames/${frameName}.png;
 
       frameImg.onload = () => {
         // Clear canvas
@@ -337,7 +202,7 @@
         // Draw name text with consistent alignment
         const nameText = document.getElementById('nameInput').value;
         if (nameText) {
-          ctx.font = `bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif`;
+          ctx.font = bold ${FONT_CONFIG.nameSize}px 'Anek Malayalam', sans-serif;
           ctx.fillStyle = "#229b0f";
           ctx.textAlign = "center";
           ctx.textBaseline = "alphabetic";
@@ -350,7 +215,7 @@
         // Draw caption text with consistent alignment
         const captionText = document.getElementById('captionInput').value;
         if (captionText) {
-          ctx.font = `${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif`;
+          ctx.font = ${FONT_CONFIG.captionSize}px 'Anek Malayalam', sans-serif;
           ctx.fillStyle = "black";
           ctx.textAlign = "center";
           ctx.textBaseline = "alphabetic";
@@ -517,7 +382,7 @@
         tempCtx.drawImage(canvas, 0, 0);
 
         const link = document.createElement('a');
-        link.download = `${nameText}-${frameText}.png`;
+        link.download = ${nameText}-${frameText}.png;
         link.href = tempCanvas.toDataURL("image/png");
         link.click();
       });
