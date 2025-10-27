@@ -131,7 +131,7 @@
     
     // Pinch zoom variables
     let initialPinchDistance = 0;
-    let initialPhotoSize = { w: 0, h: 0 };
+    let initialPhotoState = { w: 0, h: 0, x: 0, y: 0 };
     let isPinching = false;
 
     // Handle photo upload
@@ -257,7 +257,12 @@
         // Pinch zoom start
         isPinching = true;
         initialPinchDistance = getDistance(e.touches[0], e.touches[1]);
-        initialPhotoSize = { w: photoPos.w, h: photoPos.h };
+        initialPhotoState = { 
+          w: photoPos.w, 
+          h: photoPos.h,
+          x: photoPos.x,
+          y: photoPos.y
+        };
       }
     });
 
@@ -276,10 +281,6 @@
         photoPos.x = x - dragOffset.x;
         photoPos.y = y - dragOffset.y;
         
-        // Ensure photo stays within canvas bounds
-        photoPos.x = Math.max(0, Math.min(photoPos.x, canvas.width - photoPos.w));
-        photoPos.y = Math.max(0, Math.min(photoPos.y, canvas.height - photoPos.h));
-        
         draw();
       } else if (e.touches.length === 2 && isPinching) {
         // Pinch zoom
@@ -287,26 +288,20 @@
         const scale = currentDistance / initialPinchDistance;
         
         // Calculate new dimensions
-        const newWidth = initialPhotoSize.w * scale;
-        const newHeight = initialPhotoSize.h * scale;
+        const newWidth = initialPhotoState.w * scale;
+        const newHeight = initialPhotoState.h * scale;
         
         // Only apply minimum constraint to prevent photo from becoming too small
         if (newWidth > 50 && newHeight > 50) {
-          // Calculate the center point of the photo
-          const centerX = photoPos.x + photoPos.w / 2;
-          const centerY = photoPos.y + photoPos.h / 2;
-          
           // Update dimensions
           photoPos.w = newWidth;
           photoPos.h = newHeight;
           
-          // Adjust position to keep the center point fixed
-          photoPos.x = centerX - photoPos.w / 2;
-          photoPos.y = centerY - photoPos.h / 2;
+          // Lock left edge at 270 during zoom
+          photoPos.x = 270;
           
-          // Ensure photo stays within canvas bounds
-          photoPos.x = Math.max(0, Math.min(photoPos.x, canvas.width - photoPos.w));
-          photoPos.y = Math.max(0, Math.min(photoPos.y, canvas.height - photoPos.h));
+          // Keep the same y position as at the start of the pinch
+          photoPos.y = initialPhotoState.y;
           
           draw();
         }
@@ -351,10 +346,6 @@
       photoPos.x = x - dragOffset.x;
       photoPos.y = y - dragOffset.y;
       
-      // Ensure photo stays within canvas bounds
-      photoPos.x = Math.max(0, Math.min(photoPos.x, canvas.width - photoPos.w));
-      photoPos.y = Math.max(0, Math.min(photoPos.y, canvas.height - photoPos.h));
-      
       draw();
     });
 
@@ -393,6 +384,3 @@
   </script>
 </body>
 </html>
-
-
-
